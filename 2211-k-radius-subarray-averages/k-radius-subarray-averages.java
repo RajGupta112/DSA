@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 class Solution {
     public int[] getAverages(int[] nums, int k) {
         int n = nums.length;
@@ -7,33 +9,34 @@ class Solution {
         }
 
         int[] result = new int[n];
-        // Fill with -1 initially
         Arrays.fill(result, -1);
 
         if (n < 2 * k + 1) {
-            return result; // Not enough elements to form a window
+            return result; // not enough elements for even one window
         }
 
-        long[] prefixSum = new long[n];
-        prefixSum[0] = nums[0];
+        int left = 0;
+        int right = 2 * k;
+        long sum = 0;
 
-        // Build prefix sum
-        for (int i = 1; i < n; i++) {
-            prefixSum[i] = prefixSum[i - 1] + nums[i];
+        // compute sum of first window
+        for (int j = left; j <= right; j++) {
+            sum += nums[j];  // ✅ fixed
         }
 
-        // Compute averages
-        for (int i = k; i < n - k; i++) {
-            int leftIdx = i - k;
-            int rightIdx = i + k;
+        int i = k; // window center
+        result[i] = (int)(sum / (2 * k + 1));
+        i++;
+        right++;
 
-            long sum = prefixSum[rightIdx];
-            if (leftIdx > 0) {
-                sum -= prefixSum[leftIdx - 1];
-            }
+        // sliding window
+        while (right < n) {
+            sum += nums[right] - nums[left];
+            result[i] = (int)(sum / (2 * k + 1));
 
-            int avg = (int)(sum / (2 * k + 1));
-            result[i] = avg;
+            i++;
+            left++;
+            right++;
         }
 
         return result;
