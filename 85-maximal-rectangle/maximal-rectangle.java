@@ -1,47 +1,57 @@
+import java.util.Stack;
 
 class Solution {
-    public int maximalRectangle(char[][] matrix) {
-        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
-            return 0;
-        }
 
-        int m = matrix.length;
-        int n = matrix[0].length;
-        int[] heights = new int[n];  // histogram heights
-        int maxArea = 0;
+    public int largestRectangleArea(int heights[]){
+        int n= heights.length;
+        Stack<Integer> st = new Stack<>();
+        int area=0,maxarea=0;
 
-        for (int i = 0; i < m; i++) {
-            // build histogram for this row
-            for (int j = 0; j < n; j++) {
-                if (matrix[i][j] == '1') {
-                    heights[j] += 1;
-                } else {
-                    heights[j] = 0;
-                }
+        for(int i=0;i<n;i++){
+            while(!st.isEmpty() && heights[st.peek()] > heights[i]){
+                int ids = st.pop();
+                int nse = i;
+                int pse = st.isEmpty() ? -1 : st.peek();
+                area = heights[ids] * (nse - pse - 1);
+                maxarea = Math.max(area, maxarea);
             }
-            // compute largest rectangle in this histogram
-            maxArea = Math.max(maxArea, largestRectangleArea(heights));
+            st.push(i);
         }
 
-        return maxArea;
+        while(!st.isEmpty()){
+            int ind = st.pop();
+            int nse = n;
+            int pse = st.isEmpty() ? -1 : st.peek();
+            area = heights[ind] * (nse - pse - 1);
+            maxarea = Math.max(maxarea, area);
+        }
+        return maxarea; 
     }
 
-    private int largestRectangleArea(int[] heights) {
-        int n = heights.length;
-        int maxArea = 0;
-        java.util.Stack<Integer> stack = new java.util.Stack<>();
+    public int maximalRectangle(char[][] matrix) {
+        int n = matrix.length;
+        if(n == 0) return 0;
+        int m = matrix[0].length;
+        int sum[][] = new int[n][m];
 
-        for (int i = 0; i <= n; i++) {
-            int h = (i == n ? 0 : heights[i]);
-            while (!stack.isEmpty() && h < heights[stack.peek()]) {
-                int height = heights[stack.pop()];
-                int right = i;
-                int left = stack.isEmpty() ? 0 : stack.peek() + 1;
-                int width = right - left;
-                maxArea = Math.max(maxArea, height * width);
+        // Build sum[][] as row-wise histogram heights
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                int val = matrix[i][j] - '0';
+                if(i == 0){
+                    sum[i][j] = val;
+                } else {
+                    sum[i][j] = (val == 0) ? 0 : sum[i-1][j] + 1;
+                }
             }
-            stack.push(i);
         }
-        return maxArea;
+
+        int maxarea = 0;
+        for(int i=0;i<n;i++){
+            int area = largestRectangleArea(sum[i]);
+            maxarea = Math.max(maxarea, area);
+        }
+
+        return maxarea;
     }
 }
