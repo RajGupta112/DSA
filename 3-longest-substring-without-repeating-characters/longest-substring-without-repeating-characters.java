@@ -3,25 +3,22 @@ import java.util.Set;
 
 class Solution {
     public int lengthOfLongestSubstring(String s) {
-        int n = s.length();
-        int maxLen = 0;
+       int n=s.length();
+       int max=0;
 
-        Set<Character> set = new HashSet<>();
-        int left = 0;
-
-        for (int right = 0; right < n; right++) {
-            char ch = s.charAt(right);
-
-            // Remove until no duplicate
-            while (set.contains(ch)) {
-                set.remove(s.charAt(left));
-                left++;
+       for(int i=0;i<n;i++){
+        HashSet<Character> l= new HashSet<>();
+        for(int j=i;j<n;j++){
+            char ch=s.charAt(j);
+            if( l.contains(ch)){
+                break;
             }
-
-            set.add(ch);
-            maxLen = Math.max(maxLen, right - left + 1);
+            l.add(ch);
+           
         }
+        max=Math.max(max,l.size());
+       }
+       return max;
 
-        return maxLen;
     }
 }
